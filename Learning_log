@@ -1,3 +1,24 @@
-9/10
+Learning Log
 
-	Today I learnt what a Neural Network is and how it works.I can say that now I have basic idea about how NN works and I also studied gradient descent,overfitting.
+9/10
+Loss: one number that says how wrong the model is. Lower is better.
+Gradient descent: repeatedly adjusting weights in the direction that reduces the loss. Update rule: new x = old x minus (lr times slope).
+Slope (gradient): tells which way the loss grows, so we move the opposite way.
+Learning rate (lr): the step size, chosen by me. Too big and it overshoots, too small and it is slow.
+
+10/10
+Weight: how much one particular input matters to a neuron.
+Bias: a constant added to a neuron's sum, so it can have a value even if the weighted input is zero.
+Activation function: a function applied to a neuron's sum before passing it on. It adds the bend that lets deep networks learn complex patterns.
+ReLU: an activation that outputs the sum if it is positive, otherwise 0.
+Epoch: one full pass over the training images.
+Overfitting: the model memorizes the training images instead of learning general patterns. Sign: training accuracy rises while validation accuracy stalls or drops.
+Training, validation and test set: training is the data the model learns from, validation is a mock test used to compare ideas, test is the hidden final exam never used for learning.
+
+11/10
+Softmax: converts raw scores into probabilities that add up to 1.
+Cross entropy loss: the negative of ln(probability given to the correct class). Confident and right gives a small loss, confident and wrong gives a big loss.
+Kernel (filter): a small grid of weights that slides over an image, multiplying and summing at each position to detect a pattern.
+Weight sharing: the same kernel weights are reused at every position, so convolutions need very few parameters.
+Output size of a convolution: (input size plus 2 times padding minus kernel size) divided by stride, plus 1.
+Convolution is only started, so the paper dry run and my practice tasks are still pending.
