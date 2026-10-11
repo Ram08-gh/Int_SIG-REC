@@ -2,7 +2,7 @@ Learning Log
 
 9/10
 Loss: one number that says how wrong the model is. Lower is better.
-Gradient descent: repeatedly adjusting weights in the direction that reduces the loss. Update rule: new x = old x minus (lr times slope).
+Gradient descent: repeatedly adjusting weights in the direction that reduces the loss. Update rule: x' = x - (lr*slope).
 Slope (gradient): tells which way the loss grows, so we move the opposite way.
 Learning rate (lr): the step size, chosen by me. Too big and it overshoots, too small and it is slow.
 
