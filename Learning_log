@@ -1,24 +1,46 @@
 Learning Log
 
 9/10
-Loss: one number that says how wrong the model is. Lower is better.
-Gradient descent: repeatedly adjusting weights in the direction that reduces the loss. Update rule: x' = x - (lr*slope).
-Slope (gradient): tells which way the loss grows, so we move the opposite way.
-Learning rate (lr): the step size, chosen by me. Too big and it overshoots, too small and it is slow.
+Watched 3Blue1Brown neural network chapters 1 and 2.
+Loss: one number for how wrong the model is. Lower is better.
+Gradient descent: change each weight a small step in the direction that lowers the loss. Rule: new x = old x minus lr times slope.
+Slope: shows which way the loss grows, so I move the opposite way.
+Learning rate (lr): the step size I choose. Too big overshoots, too small is slow.
+Example: loss y = (x minus 3) squared. With lr 0.1, x goes 0, 0.6, 1.08, 1.464 toward 3. With lr 1.0 it bounces between 0 and 6. With lr 1.1 it blows up.
+Mistake: I found the line x = x minus lr times slope confusing. In Python "=" means calculate the right side, then store it. I fixed this by doing the arithmetic by hand.
 
 10/10
-Weight: how much one particular input matters to a neuron.
-Bias: a constant added to a neuron's sum, so it can have a value even if the weighted input is zero.
-Activation function: a function applied to a neuron's sum before passing it on. It adds the bend that lets deep networks learn complex patterns.
-ReLU: an activation that outputs the sum if it is positive, otherwise 0.
-Epoch: one full pass over the training images.
-Overfitting: the model memorizes the training images instead of learning general patterns. Sign: training accuracy rises while validation accuracy stalls or drops.
-Training, validation and test set: training is the data the model learns from, validation is a mock test used to compare ideas, test is the hidden final exam never used for learning.
+Neuron: sum of (input times weight) plus bias, then an activation.
+Weight: how much one input matters to the neuron. Bias: a constant added to the sum.
+Activation: a function applied to the sum. ReLU keeps the sum if it is positive, otherwise 0. Without activations, stacked layers collapse into one straight line.
+Overfitting: the model memorizes training images. Sign: train accuracy rises while validation stalls or drops. Underfitting: both stay low.
+Training set is for learning, validation set is a mock test for comparing ideas, test set is the hidden final exam.
+Created my GitHub repo Int_SIG-REC.
+Mistakes: I said a weight is how important the neuron is (correct: how important one input is). I called activation a number put into the neuron (correct: a function applied to the sum). I said a ReLU neuron with sum 3 outputs 1 (correct: 3). A later check with sum minus 5 gave 0, which is right.
 
 11/10
-Softmax: converts raw scores into probabilities that add up to 1.
-Cross entropy loss: the negative of ln(probability given to the correct class). Confident and right gives a small loss, confident and wrong gives a big loss.
-Kernel (filter): a small grid of weights that slides over an image, multiplying and summing at each position to detect a pattern.
-Weight sharing: the same kernel weights are reused at every position, so convolutions need very few parameters.
-Output size of a convolution: (input size plus 2 times padding minus kernel size) divided by stride, plus 1.
-Convolution is only started, so the paper dry run and my practice tasks are still pending.
+Softmax turns raw scores into probabilities that add up to 1.
+Cross entropy loss: minus ln of the probability given to the true class. Confident and right gives a small loss, confident and wrong gives a big one. Equal scores give equal probabilities, meaning the model is unsure.
+Read the starter kit: 900 train and 240 validation images, 6 classes. The model outputs raw scores because CrossEntropyLoss already includes softmax. Images are normalized with the ImageNet mean and std, and the verifier does the same.
+Started convolution: a kernel is a small grid of weights. At each position, multiply matching cells and add, which gives one number. Sliding over the image gives a feature map. The same weights are reused everywhere (weight sharing).
+
+12/10
+A kernel multiplies cell by cell and adds. It is not matrix multiplication. Output size = (input + 2 times padding minus kernel) divided by stride, plus 1.
+A layer has many kernels, so it makes many feature maps. Kernel numbers are learned by gradient descent. Nobody tells the network to find edges. It only lowers the final loss.
+Max pooling keeps the largest value in each block. Global average pooling averages each feature map into one number. The final layer turns those numbers into one score per class.
+Batch: a group of 32 images used for one weight update. Epoch: one pass over all 900 training images, about 29 batches.
+A kernel reading many feature maps has one flat sheet per input map and makes one output map.
+Weights are like dials turned to lower the loss. Backpropagation is the chain rule applied from the loss backwards.
+Mistakes: I dropped a minus sign in a kernel calculation (correct answer 0). I made a decimal slip in a gradient step (0.01 times 7.96 is 0.0796). I mixed up batch and epoch at first.
+Still weak: how one kernel reads many feature maps at once.
+
+13/10
+Tensor: like a NumPy array that can track gradients. requires_grad tracks a weight. backward() puts the slope in x.grad. For my knob machine PyTorch gave minus 24, the same as my hand calculation.
+PyTorch image shape is batch, channels, height, width.
+PyTorch felt too fast, so we slowed down and simplified.
+
+14/10
+Set up Google Colab with a T4 GPU. Colab deletes uploaded files when a session resets, so files must be uploaded again.
+ONNX: a file format that stores a trained model, meaning the layers and the learned numbers. The onnx library reads and writes it and onnxruntime runs it. File size is about 4 bytes per weight.
+Unpacked the data and looked at the images.
+My model had 28,262 parameters, not 5,286, because I had edited the starter model (first layer 16 to 32 kernels, 3 by 3 to 5 by 5 windows).
