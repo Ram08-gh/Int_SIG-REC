@@ -1,0 +1,62 @@
+Experiment Log
+
+Setup: 6 classes, 900 train and 240 validation images, 96 by 96. Adam optimizer, learning rate 0.001, batch size 32.
+
+14/10
+Experiment 0 : starting model
+Idea: I edited the starter model (first layer 16 to 32 kernels, both windows 3 by 3 to 5 by 5). athere is no exact reason, just tested it out of curiosity. I used it as the baseline.
+Result: 28,262 parameters, 0.11 MB, 1.32 ms per image, train 99.8%, validation 100% (a rerun gave 99.6%). No image appears in both train and validation.
+Conclusion: validation cannot separate good models from better ones. Limits: I never ran the original model, and I changed two things at once.
+
+Stress test
+Idea: since validation was 100%, I tested the model on altered validation images (flip, shift, rotate, blur, darker, less colour, noise).The test code was written with the AI assistant.
+Result: original 100, flip 100, shift 100, rotate 20 89.6, blur 2 72.5, noise 20 70.0, colour 0.3 65.4, darker 0.6 11.7 (chance is 16.7). Darkened images were called glass 151, trash 43, metal 24, plastic 19, cardboard 3 (of 240).
+Conclusion: the model is fragile to brightness, blur, noise and colour. Dark images collapse into glass, might be due to the reason that most of the  training images of glass were dark coloured. It is a assumption and may need not be true.
+
+15/10
+Experiment 1 : augmentation
+Idea: the model only saw clean, bright images, so show it altered copies during training.
+Change: training images only get flips, rotation up to 20 degrees, brightness 0.5, contrast 0.3, saturation 0.4, blur on 30% of images and noise. Epochs 10 to 30.
+Result: one run gave 95.0% clean validation, another gave 98.3%. Darker 0.6 went from 11.7 to 90.8, blur 2 from 72.5 to 95.8, noise 20 from 70.0 to 94.6, rotate 20 from 89.6 to 98.3. Colour 0.3 stayed weak at 60.4. Darkened images spread over all classes (plastic 65, cardboard 42, trash 38, metal 37, paper 37, glass 21).
+Three later runs (clean, rotate 30, blur 2.5, darker 0.45, colour 0.3, noise 25): 96.7, 90.6, 85.0, 83.9, 61.5, 89.0. Clean ranged from 91.7 to 99.6, so one run is unreliable. From here every setting gets 3 runs.
+Conclusion: worked for brightness, blur, noise and rotation. Colour is still weak. I changed augmentation and epochs together.
+
+16/10
+Experiment 2 : window size 5 to 3
+Idea: stacked 3 by 3 windows cover the same area as one 5 by 5 with fewer weights.
+Change: window size 3 in both layers. Parameters 28,262 to 10,342.
+Result (3 runs, same columns): 87.4, 89.7, 68.6, 56.1, 53.1, 83.8. Train accuracy about 82%, against about 95% for Experiment 1.
+Conclusion: dropped. The model was too small and underfit. My expectation of about the same accuracy was wrong.
+
+Experiment 3 : shrink by 2 instead of 4
+Idea: shrinking less keeps more detail.
+Change: MaxPool2d(4, 4) to MaxPool2d(2, 2) in both places. Parameters stay 28,262.
+Result (3 runs): 89.3, 81.9, 71.7, 69.7, 55.3, 84.6. Train accuracy about 83%. The noise 25 score printed 84.6 for all three runs, which is unusual and I did not check it.
+Conclusion: dropped. My idea was wrong. Possible reason, untested: each final feature sees a smaller patch (about 36 pixels wide in Experiment 1, 26 in Experiment 2, 16 in Experiment 3).
+
+16/10 - 17/10
+Experiment 4 : third layer
+Idea: more depth lets features see a larger patch
+Change: one extra 5 by 5 layer with 32 filters after the second layer. Parameters 53,894.
+Result: round 1 (3 runs): 100.0, 89.4, 86.5, 88.9, 66.5, 93.3, with clean exactly 100 every time. Round 2 (3 runs): 99.6, 92.6, 81.4, 85.8, 70.4, 92.6. Six run averages: 99.8, 91.1, 84.0, 87.4, 68.5, 93.0.
+Conclusion: kept. Better and steadier on clean images than Experiment 1, with similar or slightly better stress results.
+
+17/10
+Experiment 5 : wider colour range
+Idea: training only varied colour from 0.6 to 1.4 times normal, so washed out images failed.
+Change: saturation range 0.1 to 1.5 on the Experiment 4 model.
+Result (3 runs): clean 98.3, rotate 30 87.8, blur 2.5 84.3, darker 0.45 94.3, colour 0.3 95.3 (Experiment 4: 68.5), colour 0.05 72.2 (Experiment 4: 53.1), noise 93.8. One weak run had clean 95.4.
+Conclusion: kept. Large gain on colour and darkness, small cost on clean and rotation. Colour 0.05 is outside the training range and still improved.
+
+Final model
+Run b of Experiment 5 (model_exp5_r1_b.onnx), saved as model.onnx. It was picked from 3 runs using the same images I test on, so its scores are slightly optimistic. The three run average is the fairer figure.
+Checker: 0.21 MB, 53,894 parameters, shapes pass, 0.91 ms per image (1.25 ms on a later check), validation 100%.
+Clean train 99.78% (898 of 900, one metal and one plastic wrong). Clean validation 100% (240 of 240).
+I expected glass and plastic to be confused but did not see it on clean images.
+
+Mistakes and corrections 
+1. I expected 3 by 3 windows and pooling by 2 not to hurt. Both were clearly worse.
+2. Single runs vary a lot (Experiment 1 gave 95.0 and 98.3), so I moved to 3 runs per setting. 
+3. Lower accuracy shown during augmented training was not underfitting on clean images. The final model scores 99.78% on clean training images.
+
+Limits: my stress tests are my own guesses about what could differ. I cannot see the hidden test set, and validation is at its ceiling.
