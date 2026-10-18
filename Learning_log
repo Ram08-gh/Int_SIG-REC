@@ -7,7 +7,6 @@ Gradient descent: change each weight a small step in the direction that lowers t
 Slope: shows which way the loss grows, so I move the opposite way.
 Learning rate (lr): the step size I choose. Too big overshoots, too small is slow.
 Example: loss y = (x minus 3) squared. With lr 0.1, x goes 0, 0.6, 1.08, 1.464 toward 3. With lr 1.0 it bounces between 0 and 6. With lr 1.1 it blows up.
-Mistake: I found the line x = x minus lr times slope confusing. In Python "=" means calculate the right side, then store it. I fixed this by doing the arithmetic by hand.
 
 10/10
 Neuron: sum of (input times weight) plus bias, then an activation.
@@ -16,7 +15,6 @@ Activation: a function applied to the sum. ReLU keeps the sum if it is positive,
 Overfitting: the model memorizes training images. Sign: train accuracy rises while validation stalls or drops. Underfitting: both stay low.
 Training set is for learning, validation set is a mock test for comparing ideas, test set is the hidden final exam.
 Created my GitHub repo Int_SIG-REC.
-Mistakes: I said a weight is how important the neuron is (correct: how important one input is). I called activation a number put into the neuron (correct: a function applied to the sum). I said a ReLU neuron with sum 3 outputs 1 (correct: 3). A later check with sum minus 5 gave 0, which is right.
 
 11/10
 Softmax turns raw scores into probabilities that add up to 1.
@@ -31,8 +29,6 @@ Max pooling keeps the largest value in each block. Global average pooling averag
 Batch: a group of 32 images used for one weight update. Epoch: one pass over all 900 training images, about 29 batches.
 A kernel reading many feature maps has one flat sheet per input map and makes one output map.
 Weights are like dials turned to lower the loss. Backpropagation is the chain rule applied from the loss backwards.
-Mistakes: I dropped a minus sign in a kernel calculation (correct answer 0). I made a decimal slip in a gradient step (0.01 times 7.96 is 0.0796). I mixed up batch and epoch at first.
-Still weak: how one kernel reads many feature maps at once.
 
 13/10
 Tensor: like a NumPy array that can track gradients. requires_grad tracks a weight. backward() puts the slope in x.grad. For my knob machine PyTorch gave minus 24, the same as my hand calculation.
