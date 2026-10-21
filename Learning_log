@@ -1,9 +1,9 @@
-Learning Log
+)Learning Log
 
 9/10
 Watched 3Blue1Brown neural network chapters 1 and 2.
 Loss: one number for how wrong the model is. Lower is better.
-Gradient descent: change each weight a small step in the direction that lowers the loss. Rule: new x = old x minus lr times slope.
+Gradient descent: change each weight a small step in the direction that lowers the loss. Rule: x' = x-(lr*slope).
 Slope: shows which way the loss grows, so I move the opposite way.
 Learning rate (lr): the step size I choose. Too big overshoots, too small is slow.
 Example: loss y = (x minus 3) squared. With lr 0.1, x goes 0, 0.6, 1.08, 1.464 toward 3. With lr 1.0 it bounces between 0 and 6. With lr 1.1 it blows up.
